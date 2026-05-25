@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Eye, Wifi, WifiOff, Clock, Camera, RefreshCw, ChevronRight, Activity, Cpu, BarChart2, AlertCircle, CheckCircle2, Info, ImageOff, Zap, Loader } from "lucide-react";
 import cataractImg from "figma:asset/2ceb8a4f8fa5d490847a95f8070bade231855497.png";
 
-const API_URL = "https://web-production-08f648.up.railway.app";
+const API_URL = "https://web-production-0ec06.up.railway.app";
 
 type HistoryRow = {
   id: number;
