@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import {
   Eye, Search, User, Calendar, ChevronRight,
   AlertCircle, CheckCircle2, ImageOff, Loader,
-  Clock, RefreshCw, RotateCcw, Info
+  Clock, RotateCcw, Info
 } from "lucide-react";
 
 const API_URL = "https://web-production-0ec06.up.railway.app";
@@ -37,7 +37,7 @@ const getLabelIcon = (label: string) => {
 const labelDisplay = (label: string) =>
   label === "Normal" ? "Mata Normal" : label === "Immature" ? "Katarak Immature" : "Katarak Mature";
 
-// ── Komponen foto lazy-load ────────────────────────────────
+// ── Foto lazy-load — komponen di LUAR App ─────────────────
 function PhotoCard({ rowId }: { rowId: number }) {
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "empty">("idle");
   const [src, setSrc] = useState<string | null>(null);
@@ -57,10 +57,7 @@ function PhotoCard({ rowId }: { rowId: number }) {
   useState(() => { load(); });
 
   return (
-    <div
-      className="w-full rounded-xl overflow-hidden border border-[#243044] bg-[#0b1120]"
-      style={{ aspectRatio: "4/3" }}
-    >
+    <div className="w-full rounded-xl overflow-hidden border border-[#243044] bg-[#0b1120]" style={{ aspectRatio: "4/3" }}>
       {status === "loading" && (
         <div className="w-full h-full flex flex-col items-center justify-center gap-2">
           <Loader size={22} className="text-[#34d399] animate-spin" />
@@ -80,11 +77,11 @@ function PhotoCard({ rowId }: { rowId: number }) {
   );
 }
 
-// ── Kartu hasil ────────────────────────────────────────────
+// ── Kartu hasil — komponen di LUAR App ────────────────────
 function ResultCard({ row }: { row: SearchRow }) {
   const [open, setOpen] = useState(false);
-  const colors          = getLabelColor(row.prediksi);
-  const maxConf         = Math.max(row.normal_pct, row.imm_pct, row.mat_pct);
+  const colors  = getLabelColor(row.prediksi);
+  const maxConf = Math.max(row.normal_pct, row.imm_pct, row.mat_pct);
 
   return (
     <div className="bg-[#1a2332] rounded-2xl border border-[#243044] overflow-hidden">
@@ -112,41 +109,27 @@ function ResultCard({ row }: { row: SearchRow }) {
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
-            <span className={`text-[11px] px-2 py-0.5 rounded-full border ${colors.bg} ${colors.text} ${colors.border}`}
-              style={{ fontWeight: 600 }}>
+            <span className={`text-[11px] px-2 py-0.5 rounded-full border ${colors.bg} ${colors.text} ${colors.border}`} style={{ fontWeight: 600 }}>
               {row.prediksi}
             </span>
             <span className="text-[11px] text-gray-500">#{row.id}</span>
           </div>
           <p className="text-[11px] text-gray-500">{labelDisplay(row.prediksi)}</p>
         </div>
-        <span className={`text-[15px] shrink-0 ${colors.text}`} style={{ fontWeight: 700 }}>
-          {maxConf.toFixed(1)}%
-        </span>
-        <ChevronRight
-          size={14}
-          className={`text-gray-600 shrink-0 transition-transform duration-200 ${open ? "rotate-90" : ""}`}
-        />
+        <span className={`text-[15px] shrink-0 ${colors.text}`} style={{ fontWeight: 700 }}>{maxConf.toFixed(1)}%</span>
+        <ChevronRight size={14} className={`text-gray-600 shrink-0 transition-transform duration-200 ${open ? "rotate-90" : ""}`} />
       </button>
 
-      {/* Detail: foto + bar */}
+      {/* Detail */}
       {open && (
         <div className="px-4 pb-4 pt-1 flex flex-col gap-3">
           <PhotoCard rowId={row.id} />
-
-          {/* Badge klasifikasi */}
           <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border ${colors.bg} ${colors.border}`}>
             <span className={`w-3 h-3 rounded-full ${colors.dot}`} />
             {getLabelIcon(row.prediksi)}
-            <span className={`text-[14px] ${colors.text}`} style={{ fontWeight: 700 }}>
-              {labelDisplay(row.prediksi)}
-            </span>
-            <span className={`ml-auto text-[13px] ${colors.text}`} style={{ fontWeight: 600 }}>
-              {row.confidence.toFixed(1)}%
-            </span>
+            <span className={`text-[14px] ${colors.text}`} style={{ fontWeight: 700 }}>{labelDisplay(row.prediksi)}</span>
+            <span className={`ml-auto text-[13px] ${colors.text}`} style={{ fontWeight: 600 }}>{row.confidence.toFixed(1)}%</span>
           </div>
-
-          {/* Progress bar */}
           {[
             { label: "Normal",   value: row.normal_pct, color: "bg-emerald-500" },
             { label: "Immature", value: row.imm_pct,    color: "bg-amber-500"   },
@@ -155,15 +138,10 @@ function ResultCard({ row }: { row: SearchRow }) {
             <div key={item.label}>
               <div className="flex justify-between mb-1">
                 <span className="text-[12px] text-gray-400">{item.label}</span>
-                <span className="text-[12px] text-gray-300" style={{ fontWeight: 600 }}>
-                  {item.value.toFixed(1)}%
-                </span>
+                <span className="text-[12px] text-gray-300" style={{ fontWeight: 600 }}>{item.value.toFixed(1)}%</span>
               </div>
               <div className="h-2 rounded-full bg-[#111a27] overflow-hidden">
-                <div
-                  className={`h-full rounded-full ${item.color} transition-all duration-700`}
-                  style={{ width: `${item.value}%` }}
-                />
+                <div className={`h-full rounded-full ${item.color} transition-all duration-700`} style={{ width: `${item.value}%` }} />
               </div>
             </div>
           ))}
@@ -174,17 +152,13 @@ function ResultCard({ row }: { row: SearchRow }) {
 }
 
 // ════════════════════════════════════════════════════════
-// MAIN APP
+// MAIN APP — form & result state di sini, JSX langsung
 // ════════════════════════════════════════════════════════
 export default function App() {
-  const [page, setPage] = useState<"form" | "result">("form");
-
-  // Form state
+  const [page,    setPage]    = useState<"form" | "result">("form");
   const [nama,    setNama]    = useState("");
   const [usia,    setUsia]    = useState("");
   const [kelamin, setKelamin] = useState("");
-
-  // Result state
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<SearchRow[]>([]);
   const [error,   setError]   = useState<string | null>(null);
@@ -201,7 +175,6 @@ export default function App() {
       if (nama.trim()) params.append("nama",    nama.trim());
       if (usia)        params.append("usia",    usia);
       if (kelamin)     params.append("kelamin", kelamin);
-
       const res  = await fetch(`${API_URL}/search?${params}`);
       const json = await res.json();
       if (json.error) throw new Error(json.error);
@@ -221,8 +194,8 @@ export default function App() {
     setNama(""); setUsia(""); setKelamin("");
   };
 
-  // ── HALAMAN FORM ─────────────────────────────────────────
-  const FormPage = () => (
+  // ── HALAMAN FORM — JSX langsung, bukan komponen inner ──
+  if (page === "form") return (
     <div className="min-h-screen bg-[#0b1120] flex flex-col items-center justify-center px-4 py-10">
       <div className="w-full max-w-sm flex flex-col gap-5">
 
@@ -230,25 +203,17 @@ export default function App() {
         <div className="flex flex-col items-center gap-3 mb-2">
           <div className="bg-[#0d2e24] border border-[#1a5c42] px-4 py-2 rounded-full flex items-center gap-2">
             <Eye size={15} className="text-[#34d399]" />
-            <span className="text-[11px] text-[#34d399] tracking-widest" style={{ fontWeight: 700 }}>
-              KATARAK IoT DETECTOR
-            </span>
+            <span className="text-[11px] text-[#34d399] tracking-widest" style={{ fontWeight: 700 }}>KATARAK IoT DETECTOR</span>
           </div>
-          <h1 className="text-[20px] text-gray-100 text-center" style={{ fontWeight: 700 }}>
-            Portal Pasien
-          </h1>
-          <p className="text-[13px] text-gray-500 text-center">
-            Cari data hasil deteksi katarak Anda
-          </p>
+          <h1 className="text-[20px] text-gray-100 text-center" style={{ fontWeight: 700 }}>Portal Pasien</h1>
+          <p className="text-[13px] text-gray-500 text-center">Cari data hasil deteksi katarak Anda</p>
         </div>
 
         {/* Form card */}
         <div className="bg-[#1a2332] rounded-2xl border border-[#243044] p-5 flex flex-col gap-4">
           <div className="flex items-center gap-2">
             <Search size={16} className="text-[#34d399]" />
-            <span className="text-[14px] text-gray-200" style={{ fontWeight: 600 }}>
-              Data pencarian
-            </span>
+            <span className="text-[14px] text-gray-200" style={{ fontWeight: 600 }}>Data pencarian</span>
           </div>
 
           {/* Nama */}
@@ -274,6 +239,7 @@ export default function App() {
                 onChange={e => setUsia(e.target.value)}
                 placeholder="Tahun"
                 min={1} max={120}
+                onKeyDown={e => e.key === "Enter" && handleSearch()}
                 className="w-full bg-[#111a27] border border-[#243044] rounded-xl px-3 py-2.5 text-[13px] text-gray-200 placeholder-gray-600 outline-none focus:border-[#34d399] transition-colors"
               />
             </div>
@@ -327,8 +293,7 @@ export default function App() {
             <div key={item.label} className="flex items-start gap-2">
               <span className={`w-2 h-2 rounded-full mt-1 shrink-0 ${item.dot}`} />
               <p className="text-[12px] text-gray-500">
-                <span className="text-gray-300" style={{ fontWeight: 600 }}>{item.label}:</span>{" "}
-                {item.desc}
+                <span className="text-gray-300" style={{ fontWeight: 600 }}>{item.label}:</span>{" "}{item.desc}
               </p>
             </div>
           ))}
@@ -341,8 +306,8 @@ export default function App() {
     </div>
   );
 
-  // ── HALAMAN HASIL ─────────────────────────────────────────
-  const ResultPage = () => (
+  // ── HALAMAN HASIL — JSX langsung ──────────────────────
+  return (
     <div className="min-h-screen bg-[#0b1120] px-4 pt-4 pb-8">
       <div className="max-w-md mx-auto flex flex-col gap-4">
 
@@ -351,14 +316,10 @@ export default function App() {
           <div className="flex items-center gap-3">
             <div className="bg-[#0d2e24] border border-[#1a5c42] px-3 py-1.5 rounded-full flex items-center gap-2">
               <Eye size={13} className="text-[#34d399]" />
-              <span className="text-[10px] text-[#34d399] tracking-widest" style={{ fontWeight: 700 }}>
-                KATARAK IoT
-              </span>
+              <span className="text-[10px] text-[#34d399] tracking-widest" style={{ fontWeight: 700 }}>KATARAK IoT</span>
             </div>
             <div className="flex-1">
-              <p className="text-[13px] text-gray-200" style={{ fontWeight: 600 }}>
-                Hasil Pencarian
-              </p>
+              <p className="text-[13px] text-gray-200" style={{ fontWeight: 600 }}>Hasil Pencarian</p>
               <p className="text-[11px] text-gray-500">{results.length} data ditemukan</p>
             </div>
             <button
@@ -381,9 +342,7 @@ export default function App() {
         {results.length === 0 && (
           <div className="bg-[#1a2332] rounded-2xl border border-[#243044] p-8 flex flex-col items-center gap-3">
             <ImageOff size={32} className="text-gray-600" />
-            <p className="text-[14px] text-gray-400" style={{ fontWeight: 600 }}>
-              Data tidak ditemukan
-            </p>
+            <p className="text-[14px] text-gray-400" style={{ fontWeight: 600 }}>Data tidak ditemukan</p>
             <p className="text-[12px] text-gray-600 text-center">
               Coba ubah kata kunci atau hubungi petugas untuk memastikan data sudah diinput.
             </p>
@@ -397,9 +356,7 @@ export default function App() {
         )}
 
         {/* Daftar hasil */}
-        {results.map(row => (
-          <ResultCard key={row.id} row={row} />
-        ))}
+        {results.map(row => <ResultCard key={row.id} row={row} />)}
 
         <p className="text-center text-[11px] text-gray-600 flex items-center justify-center gap-1 mt-2">
           <Eye size={11} className="text-[#34d399]" /> Deteksi Katarak IoT — ESP32-CAM · 2026
@@ -407,6 +364,4 @@ export default function App() {
       </div>
     </div>
   );
-
-  return page === "form" ? <FormPage /> : <ResultPage />;
 }
